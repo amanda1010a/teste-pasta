@@ -1,0 +1,411 @@
+/*============================================================================================================================
+|PROCEDURE:
+
+|PROJETO: CUBO INCIDENTES MTTR
+
+|DESCRICAO: PROCEDURE PARA A CARGA DAS TABELAS FINAIS DO PROJETO DO CUBO INCIDENTES MTTR
+
+| ---------------------------------------------------------------------------------------------------------------------------
+| AUTOR:                                            DATA:                                       DESCRICAO:
+| AMANDA OLIVEIRA (SGITI - TELEMTRIA)               26/10/2021                                  CRIAÇÃO DA PROCEDURE
+============================================================================================================================*/
+
+
+/*********************************************************************************************
+										DIMENSOES
+**********************************************************************************************/
+
+
+/*
+------------------------------------------
+-- CAUSA INCIDENTE
+------------------------------------------
+MERGE 
+    GITI_TB_D_CAUSA_INCIDENTE AS Destino
+USING 
+    GITI_TB_F_INCIDENTE_ANALITICO AS Origem ON (    Origem.NM_CAUZA_RAIZ_1    = Destino.NM_CAUZA_RAIZ_1      
+	                                            AND Origem.NM_CAUZA_RAIZ_2    = Destino.NM_CAUZA_RAIZ_2      
+	                                            AND Origem.NM_CAUZA_RAIZ_3    = Destino.NM_CAUZA_RAIZ_3      
+	                                            AND Origem.NM_CAUZA_RAIZ_4    = Destino.NM_CAUZA_RAIZ_4      
+	                                            AND Origem.NM_CAUZA_RAIZ_5    = Destino.NM_CAUZA_RAIZ_5      
+	                                            AND Origem.NM_ORIGEM_OFENSORA = Destino.NM_ORIGEM_OFENSORA)
+WHEN NOT MATCHED THEN
+    INSERT (NM_CAUZA_RAIZ_1,NM_CAUZA_RAIZ_2,NM_CAUZA_RAIZ_3,NM_CAUZA_RAIZ_4,NM_CAUZA_RAIZ_5,NM_ORIGEM_OFENSORA)
+    VALUES(Origem.NM_CAUZA_RAIZ_1,Origem.NM_CAUZA_RAIZ_2,Origem.NM_CAUZA_RAIZ_3,Origem.NM_CAUZA_RAIZ_4,Origem.NM_CAUZA_RAIZ_5,Origem.NM_ORIGEM_OFENSORA);
+*/
+
+------------------------------------------
+-- CAUSA CO PROPRIETARIO
+------------------------------------------
+
+MERGE 
+    GITI_TB_D_CO_PROPRIETARIO AS Destino
+USING 
+    (SELECT DISTINCT NM_CO_PROPRIETARIO,NM_POSSUI_CO_PROPRIETARIO
+	 FROM GITI_TB_F_INCIDENTE_ANALITICO) AS Origem ON (    Origem.NM_CO_PROPRIETARIO        = Destino.NM_CO_PROPRIETARIO
+	                                                   AND Origem.NM_POSSUI_CO_PROPRIETARIO = Destino.NM_POSSUI_CO_PROPRIETARIO)
+WHEN NOT MATCHED THEN
+    INSERT 
+    VALUES(Origem.NM_CO_PROPRIETARIO, Origem.NM_POSSUI_CO_PROPRIETARIO,GETDATE());
+
+
+------------------------------------------
+-- CAUSA CRIADO POR
+------------------------------------------
+
+MERGE 
+    GITI_TB_D_CRIADO_POR_INCIDENTE AS Destino
+USING 
+    (SELECT DISTINCT  NM_COORDENACAO_CRIADO_POR     			   
+					 ,NM_DIRETORIA_CRIADO_POR       				     
+					 ,NM_GERENCIA_CRIADO_POR           
+					 ,NM_SUPERINTENDENCIA_CRIADO_POR
+	 FROM GITI_TB_F_INCIDENTE_ANALITICO) AS Origem ON (Origem.NM_COORDENACAO_CRIADO_POR = Destino.NM_COORDENACAO_CRIADO_POR)
+WHEN MATCHED THEN
+    UPDATE SET              
+		Destino.NM_DIRETORIA_CRIADO_POR        = Origem.NM_DIRETORIA_CRIADO_POR,                 
+		Destino.NM_GERENCIA_CRIADO_POR         = Origem.NM_GERENCIA_CRIADO_POR ,                  
+		Destino.NM_SUPERINTENDENCIA_CRIADO_POR = Origem.NM_SUPERINTENDENCIA_CRIADO_POR,
+        Destino.DTHR_PROCESSAMENTO             = GETDATE()
+WHEN NOT MATCHED THEN
+    INSERT 
+    VALUES(Origem.NM_COORDENACAO_CRIADO_POR,Origem.NM_DIRETORIA_CRIADO_POR,Origem.NM_GERENCIA_CRIADO_POR ,Origem.NM_SUPERINTENDENCIA_CRIADO_POR,GETDATE());
+
+
+------------------------------------------
+-- HIERARQUIA EM NOME DE
+------------------------------------------
+
+MERGE 
+    GITI_TB_D_INCIDENTE_EM_NOME_DE AS Destino
+USING 
+    (SELECT DISTINCT  NM_COORDENACAO_EM_NOME_DE     			   
+					 ,NM_DIRETORIA_EM_NOME_DE       				     
+					 ,NM_GERENCIA_EM_NOME_DE           
+					 ,NM_SUPERITENDENCIA_EM_NOME_DE
+	 FROM GITI_TB_F_INCIDENTE_ANALITICO) AS Origem ON (Origem.NM_COORDENACAO_EM_NOME_DE = Destino.NM_COORDENACAO_EM_NOME_DE)
+WHEN MATCHED THEN
+    UPDATE SET             
+		Destino.NM_DIRETORIA_EM_NOME_DE        = Origem.NM_DIRETORIA_EM_NOME_DE,                 
+		Destino.NM_GERENCIA_EM_NOME_DE         = Origem.NM_GERENCIA_EM_NOME_DE ,                  
+		Destino.NM_SUPERITENDENCIA_EM_NOME_DE = Origem.NM_SUPERITENDENCIA_EM_NOME_DE,
+        Destino.DTHR_PROCESSAMENTO             = GETDATE()
+WHEN NOT MATCHED THEN
+    INSERT 
+    VALUES(Origem.NM_COORDENACAO_EM_NOME_DE,Origem.NM_DIRETORIA_EM_NOME_DE,Origem.NM_GERENCIA_EM_NOME_DE ,Origem.NM_SUPERITENDENCIA_EM_NOME_DE,GETDATE());
+
+
+------------------------------------------
+-- HIERARQUIA SOLUCIONADO POR
+------------------------------------------
+
+MERGE 
+    GITI_TB_D_SOLUC_INC AS Destino
+USING 
+    (SELECT DISTINCT  NM_COORDENACAO_SOLUCIONADOR     			   
+					 ,NM_DIRETORIA_SOLUCIONADOR       				     
+					 ,NM_GERENCIA_SOLUCIONADOR           
+					 ,NM_SUPERITENDENCIA_SOLUCIONADOR
+	 FROM GITI_TB_F_INCIDENTE_ANALITICO) AS Origem ON (Origem.NM_COORDENACAO_SOLUCIONADOR = Destino.NM_COORDENACAO_SOLUCIONADOR)
+WHEN MATCHED THEN
+    UPDATE SET             
+		Destino.NM_DIRETORIA_SOLUCIONADOR        = Origem.NM_DIRETORIA_SOLUCIONADOR,                 
+		Destino.NM_GERENCIA_SOLUCIONADOR         = Origem.NM_GERENCIA_SOLUCIONADOR ,                  
+		Destino.NM_SUPERITENDENCIA_SOLUCIONADOR = Origem.NM_SUPERITENDENCIA_SOLUCIONADOR,
+        Destino.DTHR_PROCESSAMENTO             = GETDATE()
+WHEN NOT MATCHED THEN
+    INSERT 
+    VALUES(Origem.NM_COORDENACAO_SOLUCIONADOR,Origem.NM_DIRETORIA_SOLUCIONADOR,Origem.NM_GERENCIA_SOLUCIONADOR ,Origem.NM_SUPERITENDENCIA_SOLUCIONADOR,GETDATE());
+
+
+
+------------------------------------------
+-- INCIDENTE
+------------------------------------------
+MERGE 
+    GITI_TB_D_INCIDENTE AS Destino
+USING 
+    (SELECT DISTINCT  NU_NUMERO_INCIDENTE               
+					 ,NM_PROATIVO                       
+					 ,NM_STATUS                         
+					 ,NM_STATUS_AGRUPADO                
+					 ,NM_ELEGIVEL_MTTR                  
+					 ,NM_FLUXO_ALTERNATIVO_DE_TRATAMENTO
+					 ,NM_PRIORIDADE                     
+					 ,NU_INCIDENTE_GLOBAL               
+					 ,NM_GRUPO_REAL                     
+					 ,NM_CAUSA_IDENTIFICADA             
+					 ,NM_ATENDIMENTO_FIM_IMPACTO        
+					 ,NM_CLIENTE_IMPACTADO              
+					 ,NM_ELEGIVEL_ABERTURA              
+					 ,NM_ELEGIVEL_ESTOQUE               
+					 ,NM_INCIDENTE_NORMALIZADO          
+					 ,NM_TIPO_INCIDENTE 
+					 ,NM_TIPO_INCIDENTE_SGITI
+					 ,NM_ORIGEM_ITSM         
+					 ,DT_REFERENCIA          
+	 FROM GITI_TB_F_INCIDENTE_ANALITICO) AS Origem ON (Origem.NU_NUMERO_INCIDENTE = Destino.NU_NUMERO_INCIDENTE)
+WHEN MATCHED THEN	             
+    UPDATE SET 		             
+		Destino.NM_PROATIVO                        = Origem.NM_PROATIVO,                           
+		Destino.NM_STATUS                          = Origem.NM_STATUS,                           
+		Destino.NM_STATUS_AGRUPADO                 = Origem.NM_STATUS_AGRUPADO,                  
+		Destino.NM_ELEGIVEL_MTTR                   = Origem.NM_ELEGIVEL_MTTR,                    
+		Destino.NM_FLUXO_ALTERNATIVO_DE_TRATAMENTO = Origem.NM_FLUXO_ALTERNATIVO_DE_TRATAMENTO,  
+		Destino.NM_PRIORIDADE                      = Origem.NM_PRIORIDADE,                      
+		Destino.NU_INCIDENTE_GLOBAL                = Origem.NU_INCIDENTE_GLOBAL,               
+		Destino.NM_GRUPO_REAL                      = Origem.NM_GRUPO_REAL,                     
+        Destino.NM_CAUSA_IDENTIFICADA              = Origem.NM_CAUSA_IDENTIFICADA,             
+		Destino.NM_ATENDIMENTO_FIM_IMPACTO         = Origem.NM_ATENDIMENTO_FIM_IMPACTO,        
+		Destino.NM_CLIENTE_IMPACTADO               = Origem.NM_CLIENTE_IMPACTADO,              
+		Destino.NM_ELEGIVEL_ABERTURA               = Origem.NM_ELEGIVEL_ABERTURA,              
+		Destino.NM_ELEGIVEL_ESTOQUE                = Origem.NM_ELEGIVEL_ESTOQUE,               
+		Destino.NM_INCIDENTE_NORMALIZADO           = Origem.NM_INCIDENTE_NORMALIZADO,          
+		Destino.NM_TIPO_INCIDENTE                  = Origem.NM_TIPO_INCIDENTE,                 
+		Destino.NM_TIPO_INCIDENTE_SGITI            = Origem.NM_TIPO_INCIDENTE_SGITI,           
+		Destino.NM_ORIGEM_ITSM                     = Origem.NM_ORIGEM_ITSM,                    
+		Destino.DT_REFERENCIA                      = Origem.DT_REFERENCIA                     
+WHEN NOT MATCHED THEN
+    INSERT 
+    VALUES(Origem.NU_NUMERO_INCIDENTE,Origem.NM_PROATIVO,Origem.NM_STATUS,Origem.NM_STATUS_AGRUPADO,Origem.NM_ELEGIVEL_MTTR,Origem.NM_FLUXO_ALTERNATIVO_DE_TRATAMENTO,Origem.NM_PRIORIDADE,  
+Origem.NU_INCIDENTE_GLOBAL,Origem.NM_GRUPO_REAL,Origem.NM_CAUSA_IDENTIFICADA,Origem.NM_ATENDIMENTO_FIM_IMPACTO,Origem.NM_CLIENTE_IMPACTADO,   
+Origem.NM_ELEGIVEL_ABERTURA,Origem.NM_ELEGIVEL_ESTOQUE,Origem.NM_INCIDENTE_NORMALIZADO,Origem.NM_TIPO_INCIDENTE,Origem.NM_TIPO_INCIDENTE_SGITI,
+Origem.NM_ORIGEM_ITSM,Origem.DT_REFERENCIA);
+
+
+------------------------------------------
+-- SERVIÇO DE NEGÓCIO
+------------------------------------------
+MERGE 
+    GITI_TB_D_TIPO_OF_SERV_NEG AS Destino
+USING 
+    (SELECT DISTINCT  NM_SERVICO_NEGOCIO               
+					-- ,NM_PONTO_INTERACAO                                
+	 FROM GITI_TB_F_INCIDENTE_ANALITICO) AS Origem ON (Origem.NM_SERVICO_NEGOCIO = Destino.NM_SERVICO_NEGOCIO)                  
+WHEN NOT MATCHED THEN
+    INSERT  (NM_SERVICO_NEGOCIO)
+    VALUES(Origem.NM_SERVICO_NEGOCIO);
+
+
+
+------------------------------------------
+-- PRIORIDADE
+------------------------------------------
+MERGE 
+    GITI_TB_D_PRIORIDADE AS Destino
+USING 
+    (SELECT DISTINCT  NM_PRIORIDADE                                             
+	 FROM GITI_TB_F_INCIDENTE_ANALITICO) AS Origem ON (Origem.NM_PRIORIDADE = Destino.NM_PRIORIDADE)                  
+WHEN NOT MATCHED THEN
+    INSERT 
+    VALUES(Origem.NM_PRIORIDADE,GETDATE());
+
+------------------------------------------
+-- EMPRESA
+------------------------------------------
+MERGE 
+    GITI_TB_D_EMPRESA AS Destino
+USING 
+    (SELECT DISTINCT  NM_EMPRESA                                             
+	 FROM GITI_TB_F_INCIDENTE_ANALITICO) AS Origem ON (Origem.NM_EMPRESA = Destino.NM_EMPRESA)                  
+WHEN NOT MATCHED THEN
+    INSERT 
+    VALUES(Origem.NM_EMPRESA,GETDATE());
+
+
+------------------------------------------
+-- DATA ABERTURA
+------------------------------------------
+MERGE 
+    GITI_TB_D_DATA_ABERTURA AS Destino
+USING 
+    (SELECT DISTINCT  NM_SEMANA_APURACAO_ABERTURA AS NM_SEMANA_ABERTURA,
+	                  NM_ORDEM_ABERTURA,
+					  DT_MES_APURACAO_ABERTURA    AS NM_MES_ABERTURA
+	 FROM GITI_TB_F_INCIDENTE_ANALITICO) AS Origem ON (    Origem.NM_SEMANA_ABERTURA = Destino.NM_SEMANA_ABERTURA
+	                                                   AND Origem.NM_ORDEM_ABERTURA  = Destino.NM_ORDEM_ABERTURA
+													   AND Origem.NM_MES_ABERTURA    = Destino.NM_MES_ABERTURA)                  
+WHEN NOT MATCHED THEN
+    INSERT (NM_SEMANA_ABERTURA,NM_ORDEM_ABERTURA,NM_MES_ABERTURA,DTHR_PROCESSAMENTO)
+    VALUES(Origem.NM_SEMANA_ABERTURA,Origem.NM_ORDEM_ABERTURA,Origem.NM_MES_ABERTURA,GETDATE());
+
+
+
+------------------------------------------
+-- DATA ENCERRAMENTO
+------------------------------------------
+MERGE 
+    GITI_TB_D_DATA_ENCERRAMENTO AS Destino
+USING 
+    (SELECT DISTINCT  NM_SEMANA_APURACAO_ENCERRAMENTO  AS NM_SEMANA_ENCERRAMENTO,
+	                  NM_ORDEM_CARTEIRA,      
+					  NM_ORDEM_ENCERRAMENTO  ,
+					  DT_MES_APURACAO_ESTOQUE
+	 FROM GITI_TB_F_INCIDENTE_ANALITICO) AS Origem ON (    Origem.NM_SEMANA_ENCERRAMENTO = Destino.NM_SEMANA_ENCERRAMENTO
+	                                                   AND Origem.NM_ORDEM_CARTEIRA      = Destino.NM_ORDEM_CARTEIRA
+													   AND Origem.NM_ORDEM_ENCERRAMENTO  = Destino.NM_ORDEM_ENCERRAMENTO
+													   AND Origem.DT_MES_APURACAO_ESTOQUE= Destino.DT_MES_APURACAO_ESTOQUE)                  
+WHEN NOT MATCHED THEN
+    INSERT (NM_SEMANA_ENCERRAMENTO,NM_ORDEM_CARTEIRA,NM_ORDEM_ENCERRAMENTO,DT_MES_APURACAO_ESTOQUE,DTHR_PROCESSAMENTO)
+    VALUES(Origem.NM_SEMANA_ENCERRAMENTO,Origem.NM_ORDEM_CARTEIRA,Origem.NM_ORDEM_ENCERRAMENTO,Origem.DT_MES_APURACAO_ESTOQUE,GETDATE());
+
+
+------------------------------------------
+-- DATA FIM IMPACTO
+------------------------------------------
+MERGE 
+    GITI_TB_D_DATA_FIM_IMPACTO AS Destino
+USING 
+    (SELECT DISTINCT  NM_SEMANA_APURACAO_MTTR,
+	                  NM_ORDEM_FIM_IMPACTO,      
+					  DT_MES_APURACAO_MTTR
+	 FROM GITI_TB_F_INCIDENTE_ANALITICO) AS Origem ON (    Origem.NM_SEMANA_APURACAO_MTTR = Destino.NM_SEMANA_APURACAO_MTTR
+	                                                   AND Origem.NM_ORDEM_FIM_IMPACTO    = Destino.NM_ORDEM_FIM_IMPACTO
+													   AND Origem.DT_MES_APURACAO_MTTR    = Destino.DT_MES_APURACAO_MTTR)                  
+WHEN NOT MATCHED THEN
+    INSERT (NM_SEMANA_APURACAO_MTTR,NM_ORDEM_FIM_IMPACTO,DT_MES_APURACAO_MTTR,DTHR_PROCESSAMENTO)
+    VALUES(Origem.NM_SEMANA_APURACAO_MTTR,Origem.NM_ORDEM_FIM_IMPACTO,Origem.DT_MES_APURACAO_MTTR,GETDATE());
+
+
+
+------------------------------------------
+-- GARAGEM
+------------------------------------------
+MERGE 
+    GITI_TB_D_GARAGEM AS Destino
+USING 
+    (SELECT DISTINCT  NM_GARAGEM_N1,
+	                  NM_GARAGEM_N2
+	 FROM GITI_TB_F_INCIDENTE_ANALITICO) AS Origem ON (    Origem.NM_GARAGEM_N1 = Destino.NM_GARAGEM_N1
+	                                                   AND Origem.NM_GARAGEM_N2 = Destino.NM_GARAGEM_N2)                  
+WHEN NOT MATCHED THEN
+    INSERT 
+    VALUES(Origem.NM_GARAGEM_N1,Origem.NM_GARAGEM_N2,GETDATE());
+
+
+------------------------------------------
+-- OBJETIVO MTTR
+------------------------------------------
+MERGE 
+    GITI_TB_D_OBJETIVO_MTTR AS Destino
+USING 
+    (SELECT DISTINCT  NM_ADERENCIA_OBJETIVO_MTTR,
+	                  NM_ADERENCIA_OBJETIVO_MTTR_CETEC
+	 FROM GITI_TB_F_INCIDENTE_ANALITICO) AS Origem ON (    Origem.NM_ADERENCIA_OBJETIVO_MTTR = Destino.NM_ADERENCIA_OBJETIVO_MTTR
+	                                                   AND Origem.NM_ADERENCIA_OBJETIVO_MTTR_CETEC = Destino.NM_ADERENCIA_OBJETIVO_MTTR_CETEC)                  
+WHEN NOT MATCHED THEN
+    INSERT 
+    VALUES(Origem.NM_ADERENCIA_OBJETIVO_MTTR,Origem.NM_ADERENCIA_OBJETIVO_MTTR_CETEC,GETDATE());	
+
+------------------------------------------
+-- ACCELERATE
+------------------------------------------
+MERGE 
+    GITI_TB_D_ACCELERATE AS Destino
+USING 
+    (SELECT DISTINCT  NM_ACCELERATE_CLASSIFICAO AS NM_ACCELERATE
+	 FROM GITI_TB_F_INCIDENTE_ANALITICO) AS Origem ON (Origem.NM_ACCELERATE = Destino.NM_ACCELERATE)                  
+WHEN NOT MATCHED THEN
+    INSERT 
+    VALUES(Origem.NM_ACCELERATE,GETDATE());	
+
+------------------------------------------
+-- ORIGEM OFENSSORA
+------------------------------------------
+MERGE 
+    GITI_TB_D_ORIGEM_OFENSORA AS Destino
+USING 
+    (SELECT DISTINCT  NM_ORIGEM_OFENSORA,
+	                  NM_TEM_RDP,           
+					  NM_TEM_GMUD,          
+					  NM_TEM_CAUSA_RAIZ   
+					--  ,NM_NAO_TEM_CAUSA_RAIZ
+	 FROM GITI_TB_F_INCIDENTE_ANALITICO) AS Origem ON (Origem.NM_ORIGEM_OFENSORA      = Destino.NM_ORIGEM_OFENSORA
+	                                                   AND Origem.NM_TEM_RDP          = Destino.NM_TEM_RDP
+													   AND  Origem.NM_TEM_GMUD        = Destino.NM_TEM_GMUD
+													   AND  Origem.NM_TEM_CAUSA_RAIZ  = Destino.NM_TEM_CAUSA_RAIZ)                  
+WHEN NOT MATCHED THEN
+    INSERT (NM_ORIGEM_OFENSORA,NM_TEM_RDP,NM_TEM_GMUD,NM_TEM_CAUSA_RAIZ,DTHT_PROCESSAMENTO)
+    VALUES(Origem.NM_ORIGEM_OFENSORA,Origem.NM_TEM_RDP,Origem.NM_TEM_GMUD,Origem.NM_TEM_CAUSA_RAIZ,GETDATE());	
+
+
+------------------------------------------
+-- FOUNDATION DE-PARA
+------------------------------------------
+MERGE 
+    GITI_TB_D_FONDATION_DEXPARA AS Destino
+USING 
+    (SELECT DISTINCT  NM_HIGHLIGHT_COMUNIDADE_RT AS NM_HIGHLIGHT_CETEC_COMUNIDADE_RT,
+	                  NM_COMUNIDADE_RT,           
+					  ID_RELEASE_TRAIN,          
+					  ID_COMUNIDADE   
+	 FROM GITI_TB_F_INCIDENTE_ANALITICO) AS Origem ON (Origem.NM_HIGHLIGHT_CETEC_COMUNIDADE_RT = Destino.NM_HIGHLIGHT_CETEC_COMUNIDADE_RT
+	                                                   AND Origem.NM_COMUNIDADE_RT             = Destino.NM_COMUNIDADE_RT
+													   AND Origem.ID_RELEASE_TRAIN             = Destino.ID_RELEASE_TRAIN
+													   AND Origem.ID_COMUNIDADE                = Destino.ID_COMUNIDADE)                  
+WHEN NOT MATCHED THEN
+    INSERT (NM_HIGHLIGHT_CETEC_COMUNIDADE_RT,NM_COMUNIDADE_RT,ID_RELEASE_TRAIN,ID_COMUNIDADE,DTHT_PROCESSAMENTO)
+    VALUES(Origem.NM_HIGHLIGHT_CETEC_COMUNIDADE_RT,Origem.NM_COMUNIDADE_RT,Origem.ID_RELEASE_TRAIN,Origem.ID_COMUNIDADE,GETDATE());	
+
+
+/*********************************************************************************************
+										FATO
+**********************************************************************************************/
+
+
+--INSERT INTO GITI_TB_F_INCIDENTE_MTTR
+SELECT  --SUM(QTD_INCIDENTES_ABERTOS)  AS QTD_INCIDENTES_ABERTOS
+	    SUM(NU_QTD_INCIDENTES_FILHOS)    AS NU_QTD_INCIDENTES_FILHOS,        
+		SUM(NU_MTTR_DIAS_CORRIDOS_SEG)   AS NU_MTTR_DIAS_CORRIDOS_SEG,
+        SUM(NU_MTTR_DIAS_UTEI_SEGUNDOS)  AS NU_MTTR_DIAS_UTEI_SEGUNDOS,
+        SUM(NU_MTTR_SEG)                 AS NU_MTTR_SEG
+	  --,ID_SK_INCIDENTE_CAUSA       
+	    ,PROP.ID_SK_CO_PROPRIETARIO       
+	    ,CRIAD_P.ID_SK_CRIADO_POR            
+	    ,INCID.ID_SK_INCIDENTE             
+	    ,SERV_NEG.ID_SK_SERV_NEG              
+	    ,PRI.ID_SK_PRIORIDADE            
+	    ,EMP.ID_SK_EMPRESA               
+	    ,DT_ABERT.ID_SK_DT_ABETURA            
+	    ,DT_ENC.ID_SK_DT_ENCERRAMENTO       
+	    ,FIM_IMP.ID_SK_DT_FIM_IMPACTO        
+	    ,GAR.ID_SK_GARAGEM               
+	    ,EM_NOM.ID_SK_INCIDENTE_EM_NOME_DE  
+	    ,SOLU_POR.ID_SK_SOLUCIONADO_POR       
+	    ,OBJ.ID_SK_ADERENTE_OBJETIVO_MTTR
+	    ,ACCE.ID_SK_ACCELERATE    
+	    ,OFFE.ID_SK_ORIGEM_OFENSORA 
+FROM GITI_TB_F_INCIDENTE_ANALITICO FATO                                                                                                                     LEFT JOIN GITI_TB_D_CO_PROPRIETARIO      AS PROP
+ON  FATO.NM_CO_PROPRIETARIO              = PROP.NM_CO_PROPRIETARIO                                                                                          LEFT JOIN GITI_TB_D_CRIADO_POR_INCIDENTE AS CRIAD_P
+ON  FATO.NM_COORDENACAO_CRIADO_POR       = CRIAD_P.NM_COORDENACAO_CRIADO_POR                                                                                LEFT JOIN GITI_TB_D_INCIDENTE            AS INCID
+ON  FATO.NU_NUMERO_INCIDENTE             = INCID.NU_NUMERO_INCIDENTE                                                                                        LEFT JOIN GITI_TB_D_TIPO_OF_SERV_NEG     AS SERV_NEG
+ON  FATO.NM_SERVICO_NEGOCIO              = SERV_NEG.NM_SERVICO_NEGOCIO /*AND FATO.NM_PONTO_INTERACAO = SERV_NEG.NM_PONTO_INTERACAO*/                        LEFT JOIN GITI_TB_D_PRIORIDADE           AS PRI
+ON  FATO.NM_PRIORIDADE                   = PRI.NM_PRIORIDADE                                                                                                LEFT JOIN GITI_TB_D_EMPRESA              AS EMP
+ON  FATO.NM_EMPRESA                      = EMP.NM_EMPRESA                                                                                                   LEFT JOIN GITI_TB_D_DATA_ABERTURA        AS DT_ABERT
+ON  FATO.NM_SEMANA_APURACAO_ABERTURA     = DT_ABERT.NM_SEMANA_ABERTURA     AND FATO.NM_ORDEM_ABERTURA       = DT_ABERT.NM_ORDEM_ABERTURA 	                
+AND FATO.DT_MES_APURACAO_ABERTURA        = DT_ABERT.NM_MES_ABERTURA                                                                                         LEFT JOIN GITI_TB_D_DATA_ENCERRAMENTO    AS DT_ENC
+ON  FATO.NM_SEMANA_APURACAO_ENCERRAMENTO = DT_ENC.NM_SEMANA_ENCERRAMENTO   AND FATO.NM_ORDEM_CARTEIRA       = DT_ENC.NM_ORDEM_CARTEIRA		                
+AND FATO.NM_ORDEM_ENCERRAMENTO           = DT_ENC.NM_ORDEM_ENCERRAMENTO    AND FATO.DT_MES_APURACAO_ESTOQUE = DT_ENC.DT_MES_APURACAO_ESTOQUE                LEFT JOIN GITI_TB_D_DATA_FIM_IMPACTO      AS FIM_IMP
+ON  FATO.NM_SEMANA_APURACAO_MTTR         = FIM_IMP.NM_SEMANA_APURACAO_MTTR AND FATO.NM_ORDEM_FIM_IMPACTO    = FIM_IMP.NM_ORDEM_FIM_IMPACTO	                
+AND FATO.DT_MES_APURACAO_MTTR            = FIM_IMP.DT_MES_APURACAO_MTTR                                                                                     LEFT JOIN GITI_TB_D_GARAGEM               AS GAR
+ON  FATO.NM_GARAGEM_N1                   = GAR.NM_GARAGEM_N1               AND FATO.NM_GARAGEM_N2           = GAR.NM_GARAGEM_N2                             LEFT JOIN GITI_TB_D_INCIDENTE_EM_NOME_DE  AS EM_NOM
+ON  FATO.NM_COORDENACAO_EM_NOME_DE       = EM_NOM.NM_COORDENACAO_EM_NOME_DE                                                                                 LEFT JOIN GITI_TB_D_SOLUC_INC             AS SOLU_POR
+ON  FATO.NM_COORDENACAO_SOLUCIONADOR     = SOLU_POR.NM_COORDENACAO_SOLUCIONADOR                                                                             LEFT JOIN GITI_TB_D_OBJETIVO_MTTR         AS OBJ
+ON  FATO.NM_ADERENCIA_OBJETIVO_MTTR      = OBJ.NM_ADERENCIA_OBJETIVO_MTTR  AND FATO.NM_ADERENCIA_OBJETIVO_MTTR_CETEC = OBJ.NM_ADERENCIA_OBJETIVO_MTTR_CETEC LEFT JOIN GITI_TB_D_ACCELERATE            AS ACCE
+ON  FATO.NM_ACCELERATE_CLASSIFICAO       = ACCE.NM_ACCELERATE                                                                                               LEFT JOIN GITI_TB_D_ORIGEM_OFENSORA       AS OFFE
+ON  FATO.NM_ORIGEM_OFENSORA              = OFFE.NM_ORIGEM_OFENSORA
+GROUP BY PROP.ID_SK_CO_PROPRIETARIO
+        ,CRIAD_P.ID_SK_CRIADO_POR            
+	    ,INCID.ID_SK_INCIDENTE             
+	    ,SERV_NEG.ID_SK_SERV_NEG              
+	    ,PRI.ID_SK_PRIORIDADE    
+		,EMP.ID_SK_EMPRESA               
+	    ,DT_ABERT.ID_SK_DT_ABETURA            
+	    ,DT_ENC.ID_SK_DT_ENCERRAMENTO 
+		,FIM_IMP.ID_SK_DT_FIM_IMPACTO 
+		,GAR.ID_SK_GARAGEM 
+		,EM_NOM.ID_SK_INCIDENTE_EM_NOME_DE 
+		,SOLU_POR.ID_SK_SOLUCIONADO_POR 
+		,OBJ.ID_SK_ADERENTE_OBJETIVO_MTTR
+		,ACCE.ID_SK_ACCELERATE 
+		,OFFE.ID_SK_ORIGEM_OFENSORA
