@@ -12,8 +12,8 @@ from selenium.webdriver.common.keys import Keys
 from PySimpleGUI import PySimpleGUI as sg
 
 class telaPython:
-	"""Classe para o encapsulamento da l�gica da tela"""
-	def __init__(self):   #defini as informa��es inicial que precisa dentro da classe
+	"""Classe para o encapsulamento da lógica da tela"""
+	def __init__(self):   #defini as informações inicial que precisa dentro da classe
 		#Laytout
 		sg.change_look_and_feel('Topanga')
 		layout = [
@@ -58,3 +58,62 @@ tela.Iniciar()
 #driver.find_element_by_name("login").Click();
 
 #driver.find_element_by_name("q").send_keys(Keys.RETURN)
+
+
+Aqui está uma versão melhorada e mais estruturada para você alinhar suas atividades com o seu chefe:
+
+Gestão de Ofertas - Atualização de Atividades
+
+NFR - Accounty
+Contexto: O Itaú possui um contrato de exclusividade com o Accounty no mercado bancário, que vigora até maio de 2025. Para a renovação do contrato, é necessário atingir uma cobertura de pelo menos 1.000 clientes, sendo que atualmente estamos em 25%.
+Ações em andamento:
+
+	1.	Agendas semanais às quintas-feiras.
+	2.	UX está conduzindo entrevistas com os clientes que já contrataram o produto, focando na experiência do cliente e possíveis melhorias no fluxo pré e pós-oferta. Ana está preparando as entrevistas.
+	3.	Em 09/10, realizamos um treinamento para os officers do middle, com adesão de 10% do público.
+	4.	O time de Accounty forneceu uma lista de clientes propensos à contratação. Próximos passos incluem análise da gestão de ofertas e um piloto em colaboração com officers, utilizando MKT Cloud e Bankline. Após essas definições, faremos uma revisão com a Ingrid no GG de Não Crédito (previsão: 18/10).
+
+IGA - Piloto MKT Place (Lenovo)
+Contexto: Em parceria com a Lenovo, negociamos ofertas de produtos periféricos com preços reduzidos para o fechamento do quadrimestre. A ação está sendo direcionada a clientes do Agro e do Middle, com suporte dos especialistas de Conexão Itaú.
+Ações em andamento:
+
+	1.	Agendas semanais às segundas-feiras.
+	2.	Especialista IGA liderando o piloto com 30 clientes mapeados. Vigência do piloto: 07/09 a 04/10.
+
+IGA - Piloto Latam
+Contexto: Parceria com a Latam para ofertar promoções de viagens corporativas a clientes do atacado. O piloto envolve 4 officers.
+Ações em andamento:
+
+	1.	Público analisado para evitar impactos em ações prioritárias.
+	2.	Alinhamento realizado no GG de Não Crédito com a Ingrid.
+	3.	Peças de e-mail validadas com o Marketing Institucional.
+	4.	Checkpoints: Primeira reunião de alinhamento ocorreu em 02/10, com próximo checkpoint previsto para 18/10 para acompanhamento de resultados.
+
+Piloto Expansão do MKT Place IGA (Outubro)
+Contexto: Lançamento do MKT Place para clientes do atacado, com o primeiro produto sendo computadores Lenovo (mesmo modelo utilizado internamente no banco).
+Ações em andamento:
+
+	1.	Clientes mapeados para verificar impacto nas ações prioritárias. Apenas 10% estão envolvidos em ações de fim de ano.
+	2.	Alinhamento com Ingrid no GG de Não Crédito.
+	3.	Estratégia de abordagem: 40% dos clientes serão contatados diretamente pelos especialistas da IGA, e 60% receberão um e-mail institucional com direcionamento para contato com os especialistas. Também estamos planejando banners no Bankline para gerar leads.
+	4.	Ainda estamos finalizando a peça do banner e o fluxo de comunicação antes de enviar o e-mail de alinhamento para os officers.
+
+B2C - Compra de Ações Judiciais
+Contexto: Mapeamento de clientes que necessitam desse serviço é desafiador, pois envolve informações sensíveis.
+Ações em andamento:
+
+	1.	Utilização do MKT Cloud para comunicar clientes sobre o serviço.
+	2.	Estamos mapeando clientes que não estão envolvidos em ações prioritárias e com cadastro atualizado.
+	3.	Após o mapeamento, levaremos a proposta ao GG de Não Crédito para alinhamento dos próximos passos (previsão: 18/10).
+
+RDStation - Parceria com o Itaú
+Contexto: Parceria para oferecer licenças da RDStation com 20% de desconto aos clientes do atacado. A abordagem será via e-mail, e o piloto será conduzido na região do Ricardo.
+Ações em andamento:
+
+	1.	Refinamento e análise de clientes para evitar concorrência com outras ações prioritárias.
+	2.	Alinhamento com Marketing para criação da peça de comunicação.
+	3.	Previsão de início do piloto: 20/10.
+
+Essa estrutura permite que as informações fiquem mais claras e organizadas para facilitar o alinhamento com seu chefe.
+
+
